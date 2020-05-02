@@ -1,3 +1,4 @@
+using AlpineSkiHouseCQRS.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -22,6 +23,8 @@ namespace AlpineSkiHouseCQRS
         {
 
             services.AddControllersWithViews();
+            services.RegisterHandlers(typeof(ICommandHandler<>));
+            services.RegisterHandlers(typeof(IQueryHandler<,>));
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
