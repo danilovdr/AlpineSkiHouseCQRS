@@ -8,7 +8,7 @@ namespace AlpineSkiHouseCQRS.Data.Implementations
     {
         public DbSet<UserModel> Users { get; set; }
         public DbSet<AbonementModel> Abonements { get; set; }
-        public DbSet<UserAbonementModel> UserAbonements { get; set; }
+        public DbSet<UserAbonementModel> UsersAbonements { get; set; }
         public DbSet<ZoneModel> Zones { get; set; }
         public DbSet<SlopeModel> Slopes { get; set; }
 
@@ -16,6 +16,11 @@ namespace AlpineSkiHouseCQRS.Data.Implementations
             : base(options)
         {
             Database.EnsureCreatedAsync();
+        }
+
+        public void Save()
+        {
+            SaveChangesAsync();
         }
     }
 }

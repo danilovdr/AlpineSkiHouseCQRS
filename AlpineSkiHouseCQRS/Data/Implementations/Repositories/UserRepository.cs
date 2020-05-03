@@ -1,8 +1,10 @@
 ﻿using AlpineSkiHouseCQRS.Data.Interfaces;
 using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
 using AlpineSkiHouseCQRS.Data.Models;
-using System;
+using AlpineSkiHouseCQRS.Exceptions;
+using System.Linq;
 using System.Collections.Generic;
+using System;
 
 namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 {
@@ -20,34 +22,43 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             _dbContext.Users.Add(item);
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
-            UserModel user = 
+            UserModel user = _dbContext.Users.Find(id);
+
+            if (user == null)
+            {
+                throw new UserNotFoundException("Deleted user not found");
+            }
+
+            _dbContext.Users.Remove(user);
         }
 
-        public void Dispose()
+        public UserModel Get(Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public UserModel Get(int id)
-        {
-            throw new NotImplementedException();
+            return _dbContext.Users.Find(id);
         }
 
         public IEnumerable<UserModel> GetAll()
         {
-            throw new NotImplementedException();
-        }
-
-        public void Save()
-        {
-            throw new NotImplementedException();
+            return _dbContext.Users;
         }
 
         public void Update(UserModel item)
         {
-            throw new NotImplementedException();
+            bool hasUser = _dbContext.Users.Any(p => p.Id == item.Id);
+
+            if (!hasUser)
+            {
+                throw new UserNotFoundException("Updated user not found");
+            }
+
+            _dbContext.Users.Update(item);
+        }
+
+        public void Save()
+        {
+            _dbContext.Save();
         }
     }
 }

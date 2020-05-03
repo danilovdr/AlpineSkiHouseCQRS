@@ -7,5 +7,10 @@ namespace AlpineSkiHouseCQRS.Exceptions
 {
     public abstract class SkiHouseException : Exception
     {
+        protected SkiHouseException(string message)
+            : base(message)
+        {
+
+        }
     }
 }

@@ -1,44 +1,64 @@
-﻿using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
+﻿using AlpineSkiHouseCQRS.Data.Interfaces;
+using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
 using AlpineSkiHouseCQRS.Data.Models;
+using AlpineSkiHouseCQRS.Exceptions;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 {
     public class SlopeRepository : IRepository<SlopeModel>
     {
+        public SlopeRepository(IApplicationDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        private IApplicationDbContext _dbContext;
+
         public void Create(SlopeModel item)
         {
-            throw new System.NotImplementedException();
+            _dbContext.Slopes.Add(item);
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
-            throw new System.NotImplementedException();
+            SlopeModel slope = _dbContext.Slopes.Find(id);
+
+            if (slope == null)
+            {
+                throw new SlopeNotFoundException("Deleted slope not found");
+            }
+
+            _dbContext.Slopes.Remove(slope);
         }
 
-        public void Dispose()
+        public SlopeModel Get(Guid id)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public SlopeModel Get(int id)
-        {
-            throw new System.NotImplementedException();
+            return _dbContext.Slopes.Find(id);
         }
 
         public IEnumerable<SlopeModel> GetAll()
         {
-            throw new System.NotImplementedException();
+            return _dbContext.Slopes;
         }
 
         public void Save()
         {
-            throw new System.NotImplementedException();
+            _dbContext.Save();
         }
 
         public void Update(SlopeModel item)
         {
-            throw new System.NotImplementedException();
+            bool hasSlope = _dbContext.Slopes.Any(p => p.Id == item.Id);
+
+            if (!hasSlope)
+            {
+                throw new SlopeNotFoundException("Updated slope not found");
+            }
+
+            _dbContext.Slopes.Update(item);
         }
     }
 }

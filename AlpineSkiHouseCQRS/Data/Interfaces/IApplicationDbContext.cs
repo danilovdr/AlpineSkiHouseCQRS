@@ -7,8 +7,10 @@ namespace AlpineSkiHouseCQRS.Data.Interfaces
     {
         DbSet<UserModel> Users { get; set; }
         DbSet<AbonementModel> Abonements { get; set; }
-        DbSet<UserAbonementModel> UserAbonements { get; set; }
+        DbSet<UserAbonementModel> UsersAbonements { get; set; }
         DbSet<ZoneModel> Zones { get; set; }
         DbSet<SlopeModel> Slopes { get; set; }
+
+        void Save();
     }
 }

@@ -1,45 +1,64 @@
-﻿using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
+﻿using AlpineSkiHouseCQRS.Data.Interfaces;
+using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
 using AlpineSkiHouseCQRS.Data.Models;
+using AlpineSkiHouseCQRS.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 {
     public class ZoneRepository : IRepository<ZoneModel>
     {
+        public ZoneRepository(IApplicationDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        private IApplicationDbContext _dbContext;
+
         public void Create(ZoneModel item)
         {
-            throw new NotImplementedException();
+            _dbContext.Zones.Add(item);
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
-            throw new NotImplementedException();
+            ZoneModel zone = _dbContext.Zones.Find(id);
+
+            if (zone == null)
+            {
+                throw new ZoneNotFoundException("Deleted zone not found");
+            }
+
+            _dbContext.Zones.Remove(zone);
         }
 
-        public void Dispose()
+        public ZoneModel Get(Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public ZoneModel Get(int id)
-        {
-            throw new NotImplementedException();
+            return _dbContext.Zones.Find(id);
         }
 
         public IEnumerable<ZoneModel> GetAll()
         {
-            throw new NotImplementedException();
-        }
-
-        public void Save()
-        {
-            throw new NotImplementedException();
+            return _dbContext.Zones;
         }
 
         public void Update(ZoneModel item)
         {
-            throw new NotImplementedException();
+            bool hasZone = _dbContext.Zones.Any(p => p.Id == item.Id);
+
+            if (!hasZone)
+            {
+                throw new ZoneNotFoundException("Updated zone not found");
+            }
+
+            _dbContext.Zones.Update(item);
+        }
+
+        public void Save()
+        {
+            _dbContext.Save();
         }
     }
 }

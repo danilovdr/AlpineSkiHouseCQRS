@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Data.Interfaces.Repositories
 {
-    public interface IRepository<T> : IDisposable
+    public interface IRepository<T>
         where T : class
     {
         IEnumerable<T> GetAll(); 
-        T Get(int id); 
+        T Get(Guid id); 
         void Create(T item); 
         void Update(T item); 
-        void Delete(int id); 
+        void Delete(Guid id); 
         void Save(); 
     }
 }
