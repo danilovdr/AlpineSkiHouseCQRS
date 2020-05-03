@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace AlpineSkiHouseCQRS.Exceptions
+﻿namespace AlpineSkiHouseCQRS.Exceptions
 {
     public class UserNotFoundException : SkiHouseException
     {
+        public UserNotFoundException(string message)
+            :base(message)
+        {
+        }
     }
 }
