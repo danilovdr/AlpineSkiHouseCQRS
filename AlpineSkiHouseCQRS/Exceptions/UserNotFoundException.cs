@@ -6,5 +6,10 @@
             :base(message)
         {
         }
+
+        public UserNotFoundException() :base()
+        {
+
+        }
     }
 }

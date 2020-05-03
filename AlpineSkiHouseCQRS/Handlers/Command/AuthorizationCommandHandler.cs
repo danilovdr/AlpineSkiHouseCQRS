@@ -1,4 +1,6 @@
-﻿using AlpineSkiHouseCQRS.Exceptions;
+﻿using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
+using AlpineSkiHouseCQRS.Data.Models;
+using AlpineSkiHouseCQRS.Exceptions;
 using AlpineSkiHouseCQRS.Infrastructure;
 using AlpineSkiHouseCQRS.Models;
 using Microsoft.AspNetCore.Http;
@@ -13,9 +15,10 @@ namespace AlpineSkiHouseCQRS.Handlers.Command
 {
     public class AuthorizationCommandHandler : ICommandHandler<AuthorizationCommand>
     {
-        public AuthorizationCommandHandler()
+        IRepository<UserModel> _userRepository;
+        public AuthorizationCommandHandler(IRepository<UserModel> userRepository)
         {
-
+            _userRepository = userRepository;
         }
 
         public HttpContext HttpContext { get; private set; }
@@ -40,7 +43,6 @@ namespace AlpineSkiHouseCQRS.Handlers.Command
 
         private async Task<bool> IsUserValid(AuthorizationCommand model)
         {
-            throw new NotImplementedException();
         }
 
         private ClaimsIdentity CreateIdentity(AuthorizationCommand model)

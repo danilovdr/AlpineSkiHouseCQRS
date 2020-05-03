@@ -12,5 +12,10 @@ namespace AlpineSkiHouseCQRS.Exceptions
         {
 
         }
+
+        protected SkiHouseException() : base()
+        {
+
+        }
     }
 }
