@@ -44,6 +44,11 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             return _dbContext.Users;
         }
 
+        public IEnumerable<UserModel> Find(Func<UserModel, bool> predicate)
+        {
+            return _dbContext.Users.Where(predicate);
+        }
+
         public void Update(UserModel item)
         {
             bool hasUser = _dbContext.Users.Any(p => p.Id == item.Id);

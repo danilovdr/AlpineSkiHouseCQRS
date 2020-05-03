@@ -44,6 +44,11 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             return _dbContext.UsersAbonements;
         }
 
+        public IEnumerable<UserAbonementModel> Find(Func<UserAbonementModel, bool> predicate)
+        {
+            return _dbContext.UsersAbonements.Where(predicate);
+        }
+
         public void Update(UserAbonementModel item)
         {
             bool hasUserAbonement = _dbContext.UsersAbonements.Any(p => p.Id == item.Id);
