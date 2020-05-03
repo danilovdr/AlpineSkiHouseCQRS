@@ -1,6 +1,7 @@
 ﻿using AlpineSkiHouseCQRS.Exceptions;
 using AlpineSkiHouseCQRS.Infrastructure;
 using AlpineSkiHouseCQRS.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,13 +17,24 @@ namespace AlpineSkiHouseCQRS.Handlers.Command
         {
 
         }
+
+        public HttpContext HttpContext { get; private set; }
+
+        public void SetHttpContext(HttpContext context)
+        {
+            if (HttpContext != null) throw new InvalidOperationException("Context already set");
+
+            HttpContext = context;
+        }
+
         public async Task Handle(AuthorizationCommand parametrs)
         {
             if (!await IsUserValid(parametrs)) throw new UserNotFoundException();
 
             var identity = CreateIdentity(parametrs);
+            var token = CreateToken(identity);
 
-            throw new NotImplementedException();
+            HttpContext.Response.Cookies.Append(Constants.JWT_COOKIE, token);
         }
 
 
@@ -34,6 +46,13 @@ namespace AlpineSkiHouseCQRS.Handlers.Command
         private ClaimsIdentity CreateIdentity(AuthorizationCommand model)
         {
             throw new NotImplementedException();
+        }
+
+        private string CreateToken(ClaimsIdentity identity)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.CreateJwtSecurityToken(subject: identity, expires: DateTime.UtcNow.AddDays(1));
+            return handler.WriteToken(token);
         }
     }
 }

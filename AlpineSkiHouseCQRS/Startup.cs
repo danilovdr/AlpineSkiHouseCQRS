@@ -30,7 +30,7 @@ namespace AlpineSkiHouseCQRS
                 .AddJwtBearer(options =>
                 {
                     options.RequireHttpsMetadata = true;
-                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                    options.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidateIssuer = true,
                         ValidIssuer = Configuration.GetValue<string>("JWT_Config:Issuer"),
