@@ -5,6 +5,7 @@ using AlpineSkiHouseCQRS.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 {
@@ -17,14 +18,14 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 
         private IApplicationDbContext _dbContext;
 
-        public void Create(UserAbonementModel item)
+        public async void Create(UserAbonementModel item)
         {
-            _dbContext.UsersAbonements.Add(item);
+            await _dbContext.UsersAbonements.AddAsync(item);
         }
 
-        public void Delete(Guid id)
+        public async void Delete(Guid id)
         {
-            UserAbonementModel userAbonement = _dbContext.UsersAbonements.Find(id);
+            UserAbonementModel userAbonement = await _dbContext.UsersAbonements.FindAsync(id);
 
             if (userAbonement == null)
             {
@@ -34,9 +35,9 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             _dbContext.UsersAbonements.Remove(userAbonement);
         }
 
-        public UserAbonementModel Get(Guid id)
+        public async Task<UserAbonementModel> Get(Guid id)
         {
-            return _dbContext.UsersAbonements.Find(id);
+            return await _dbContext.UsersAbonements.FindAsync(id);
         }
 
         public IEnumerable<UserAbonementModel> GetAll()
@@ -63,7 +64,7 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 
         public void Save()
         {
-            _dbContext.Save();
+            _dbContext.SaveAsync();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AlpineSkiHouseCQRS.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Data.Interfaces
 {
@@ -11,6 +12,6 @@ namespace AlpineSkiHouseCQRS.Data.Interfaces
         DbSet<ZoneModel> Zones { get; set; }
         DbSet<SlopeModel> Slopes { get; set; }
 
-        void Save();
+        void SaveAsync();
     }
 }
