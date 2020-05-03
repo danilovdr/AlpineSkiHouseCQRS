@@ -1,3 +1,8 @@
+using AlpineSkiHouseCQRS.Data.Implementations;
+using AlpineSkiHouseCQRS.Data.Implementations.Repositories;
+using AlpineSkiHouseCQRS.Data.Interfaces;
+using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
+using AlpineSkiHouseCQRS.Data.Models;
 using AlpineSkiHouseCQRS.Infrastructure;
 using AlpineSkiHouseCQRS.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -5,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -50,7 +56,15 @@ namespace AlpineSkiHouseCQRS
             services.RegisterHandlers(typeof(ICommandHandler<>));
             services.RegisterHandlers(typeof(IQueryHandler<,>));
 
-            
+            string connectionString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
+                options.UseNpgsql(connectionString));
+
+            services.AddTransient<IRepository<UserModel>, UserRepository>();
+            services.AddTransient<IRepository<AbonementModel>, AbonementRepository>();
+            services.AddTransient<IRepository<UserAbonementModel>, UserAbonementRepository>();
+            services.AddTransient<IRepository<ZoneModel>, ZoneRepository>();
+            services.AddTransient<IRepository<SlopeModel>, SlopeRepository>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
