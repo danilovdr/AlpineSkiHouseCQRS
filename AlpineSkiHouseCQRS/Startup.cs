@@ -1,4 +1,6 @@
 using AlpineSkiHouseCQRS.Infrastructure;
+using AlpineSkiHouseCQRS.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,6 +8,8 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace AlpineSkiHouseCQRS
 {
@@ -22,9 +26,31 @@ namespace AlpineSkiHouseCQRS
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = true;
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration.GetValue<string>("JWT_Config:Issuer"),
+
+                        ValidateAudience = true,
+                        ValidAudience = Configuration.GetValue<string>("JWT_Config:Audience"),
+
+                        ValidateLifetime = true,
+
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(Configuration.GetValue<string>("JWT_PASSWORD"))),
+                        ValidateIssuerSigningKey = true
+                    };
+                }
+                );
+
             services.AddControllersWithViews();
             services.RegisterHandlers(typeof(ICommandHandler<>));
             services.RegisterHandlers(typeof(IQueryHandler<,>));
+
+            
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -53,12 +79,17 @@ namespace AlpineSkiHouseCQRS
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
             });
+
+            app.UseMiddleware<JwtAuthorization>();
 
             app.UseSpa(spa =>
             {
