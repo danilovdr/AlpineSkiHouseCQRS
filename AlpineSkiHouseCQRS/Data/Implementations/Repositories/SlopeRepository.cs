@@ -44,9 +44,9 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             return _dbContext.Slopes;
         }
 
-        public void Save()
+        public IEnumerable<SlopeModel> Find(Func<SlopeModel, bool> predicate)
         {
-            _dbContext.Save();
+            return _dbContext.Slopes.Where(predicate);
         }
 
         public void Update(SlopeModel item)
@@ -59,6 +59,11 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             }
 
             _dbContext.Slopes.Update(item);
+        }
+
+        public void Save()
+        {
+            _dbContext.Save();
         }
     }
 }

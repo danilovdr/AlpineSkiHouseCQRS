@@ -44,6 +44,12 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             return _dbContext.Zones;
         }
 
+
+        public IEnumerable<ZoneModel> Find(Func<ZoneModel, bool> predicate)
+        {
+            return _dbContext.Zones.Where(predicate);
+        }
+
         public void Update(ZoneModel item)
         {
             bool hasZone = _dbContext.Zones.Any(p => p.Id == item.Id);
