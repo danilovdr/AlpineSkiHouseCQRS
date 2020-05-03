@@ -9,12 +9,13 @@ namespace AlpineSkiHouseCQRS.Models
 {
     public class AuthorizationCommand : ICommand
     {
-        [Required]
-        [DataType(DataType.EmailAddress)]
+        [Required(ErrorMessage = "Email is empty")]
+        [EmailAddress(ErrorMessage = "Email format is invalid")]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Password is empty")]
         [DataType(DataType.Password)]
+        [StringLength(25, MinimumLength = 5, ErrorMessage =" Password must be from 5 to 25 characters")]
         public string Password { get; set; }
     }
 }
