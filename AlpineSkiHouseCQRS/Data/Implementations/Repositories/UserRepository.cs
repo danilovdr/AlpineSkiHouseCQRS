@@ -5,6 +5,7 @@ using AlpineSkiHouseCQRS.Exceptions;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 {
@@ -17,14 +18,14 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 
         private IApplicationDbContext _dbContext;
 
-        public void Create(UserModel item)
+        public async void Create(UserModel item)
         {
-            _dbContext.Users.Add(item);
+            await _dbContext.Users.AddAsync(item);
         }
 
-        public void Delete(Guid id)
+        public async void Delete(Guid id)
         {
-            UserModel user = _dbContext.Users.Find(id);
+            UserModel user = await _dbContext.Users.FindAsync(id);
 
             if (user == null)
             {
@@ -34,9 +35,9 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             _dbContext.Users.Remove(user);
         }
 
-        public UserModel Get(Guid id)
+        public async Task<UserModel> Get(Guid id)
         {
-            return _dbContext.Users.Find(id);
+            return await _dbContext.Users.FindAsync(id);
         }
 
         public IEnumerable<UserModel> GetAll()
@@ -63,7 +64,7 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 
         public void Save()
         {
-            _dbContext.Save();
+            _dbContext.SaveAsync();
         }
     }
 }

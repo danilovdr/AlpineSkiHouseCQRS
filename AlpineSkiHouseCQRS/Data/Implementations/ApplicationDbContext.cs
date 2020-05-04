@@ -18,9 +18,9 @@ namespace AlpineSkiHouseCQRS.Data.Implementations
             Database.EnsureCreatedAsync();
         }
 
-        public void Save()
+        public async void SaveAsync()
         {
-            SaveChangesAsync();
+            await SaveChangesAsync();
         }
     }
 }

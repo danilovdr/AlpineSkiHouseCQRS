@@ -5,6 +5,7 @@ using AlpineSkiHouseCQRS.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 {
@@ -17,14 +18,14 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 
         private IApplicationDbContext _dbContext;
 
-        public void Create(SlopeModel item)
+        public async void Create(SlopeModel item)
         {
-            _dbContext.Slopes.Add(item);
+            await _dbContext.Slopes.AddAsync(item);
         }
 
-        public void Delete(Guid id)
+        public async void Delete(Guid id)
         {
-            SlopeModel slope = _dbContext.Slopes.Find(id);
+            SlopeModel slope = await _dbContext.Slopes.FindAsync(id);
 
             if (slope == null)
             {
@@ -34,9 +35,9 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             _dbContext.Slopes.Remove(slope);
         }
 
-        public SlopeModel Get(Guid id)
+        public async Task<SlopeModel> Get(Guid id)
         {
-            return _dbContext.Slopes.Find(id);
+            return await _dbContext.Slopes.FindAsync(id);
         }
 
         public IEnumerable<SlopeModel> GetAll()
@@ -63,7 +64,7 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 
         public void Save()
         {
-            _dbContext.Save();
+            _dbContext.SaveAsync();
         }
     }
 }

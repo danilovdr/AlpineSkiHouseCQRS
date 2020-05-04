@@ -5,6 +5,7 @@ using AlpineSkiHouseCQRS.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 {
@@ -17,14 +18,14 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 
         private IApplicationDbContext _dbContext;
 
-        public void Create(ZoneModel item)
+        public async void Create(ZoneModel item)
         {
-            _dbContext.Zones.Add(item);
+            await _dbContext.Zones.AddAsync(item);
         }
 
-        public void Delete(Guid id)
+        public async void Delete(Guid id)
         {
-            ZoneModel zone = _dbContext.Zones.Find(id);
+            ZoneModel zone = await _dbContext.Zones.FindAsync(id);
 
             if (zone == null)
             {
@@ -34,16 +35,15 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             _dbContext.Zones.Remove(zone);
         }
 
-        public ZoneModel Get(Guid id)
+        public async Task<ZoneModel> Get(Guid id)
         {
-            return _dbContext.Zones.Find(id);
+            return await _dbContext.Zones.FindAsync(id);
         }
 
         public IEnumerable<ZoneModel> GetAll()
         {
             return _dbContext.Zones;
         }
-
 
         public IEnumerable<ZoneModel> Find(Func<ZoneModel, bool> predicate)
         {
@@ -64,7 +64,7 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 
         public void Save()
         {
-            _dbContext.Save();
+            _dbContext.SaveAsync();
         }
     }
 }
