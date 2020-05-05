@@ -1,5 +1,6 @@
 ﻿using AlpineSkiHouseCQRS.Data.Interfaces;
 using AlpineSkiHouseCQRS.Data.Models;
+using AlpineSkiHouseCQRS.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,43 @@ namespace AlpineSkiHouseCQRS.Data.Implementations
             : base(options)
         {
             Database.EnsureCreatedAsync();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserAbonementModel>()
+                .ToTable("UserAbonement")
+                .HasKey(p => new { p.UserId, p.AbonementId });
+
+            modelBuilder.Entity<UserAbonementModel>()
+                .HasOne(p => p.User)
+                .WithMany(p => p.UserAbonement)
+                .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<UserAbonementModel>()
+                .HasOne(p => p.Abonement)
+                .WithMany(p => p.UserAbonement)
+                .HasForeignKey(p => p.AbonementId);
+
+            modelBuilder.Entity<UserModel>()
+                .ToTable("Users")
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<AbonementModel>()
+                .ToTable("Abonements")
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<ZoneModel>()
+                .ToTable("Zone")
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<ZoneModel>()
+                .HasMany(p => p.Slopes)
+                .WithOne(p => p.Zone);
+
+            modelBuilder.Entity<SlopeModel>()
+                .ToTable("Slope")
+                .HasKey(p => p.Id);  
         }
 
         public async void SaveAsync()
