@@ -52,7 +52,7 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 
         public void Update(UserAbonementModel item)
         {
-            bool hasUserAbonement = _dbContext.UsersAbonements.Any(p => p.Id == item.Id);
+            bool hasUserAbonement = _dbContext.UsersAbonements.Any(p => p.UserId == item.UserId && p.AbonementId == item.AbonementId);
 
             if (!hasUserAbonement)
             {
