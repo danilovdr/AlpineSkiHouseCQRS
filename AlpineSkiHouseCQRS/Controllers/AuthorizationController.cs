@@ -19,7 +19,7 @@ namespace AlpineSkiHouseCQRS.Controllers
         [HttpPost]
         public async Task<StatusCodeResult> Authorize(AuthorizationCommand command)
         {
-            await _commandDispatcher.Dispatch(command, HttpContext).Handle(command);
+            await _commandDispatcher.Dispatch(command).Handle(command);
             return new StatusCodeResult((int)System.Net.HttpStatusCode.OK);
         }
     }

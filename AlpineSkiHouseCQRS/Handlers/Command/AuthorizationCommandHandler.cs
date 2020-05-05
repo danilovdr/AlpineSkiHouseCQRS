@@ -10,15 +10,18 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System.Security.Principal;
 
 namespace AlpineSkiHouseCQRS.Handlers.Command
 {
     public class AuthorizationCommandHandler : ICommandHandler<AuthorizationCommand>
     {
         IRepository<UserModel> _userRepository;
-        public AuthorizationCommandHandler(IRepository<UserModel> userRepository)
+        public AuthorizationCommandHandler(IRepository<UserModel> userRepository, IHttpContextAccessor httpContext)
         {
             _userRepository = userRepository;
+            HttpContext = httpContext.HttpContext;
         }
 
         public HttpContext HttpContext { get; private set; }
@@ -43,11 +46,27 @@ namespace AlpineSkiHouseCQRS.Handlers.Command
 
         private async Task<bool> IsUserValid(AuthorizationCommand model)
         {
+            var user = GetUser(model);
+            var isExist = user != null;
+            if (!isExist)
+                return false;
+
+            var resultPass =
+                KeyDerivation.Pbkdf2(model.Password, user.Salt, Constants.Authorization.PRF, Constants.Authorization.ITERATION_COUNT, Constants.Authorization.BYTES_REQUESTED);
+
+            return resultPass.IsEqualArray(user.Password);
         }
 
-        private ClaimsIdentity CreateIdentity(AuthorizationCommand model)
+        private ClaimsIdentity CreateIdentity(AuthorizationCommand command)
         {
-            throw new NotImplementedException();
+            var model = GetUser(command);
+            var identity = new ClaimsIdentity(new GenericIdentity(model.Email), new[]
+            {
+                new Claim(ClaimTypes.Email, model.Email),
+                new Claim(ClaimTypes.Name, model.FullName),
+                new Claim(ClaimTypes.Role, model.Role.Name)
+            });
+            return identity;
         }
 
         private string CreateToken(ClaimsIdentity identity)
@@ -55,6 +74,11 @@ namespace AlpineSkiHouseCQRS.Handlers.Command
             var handler = new JwtSecurityTokenHandler();
             var token = handler.CreateJwtSecurityToken(subject: identity, expires: DateTime.UtcNow.AddDays(1));
             return handler.WriteToken(token);
+        }
+
+        private UserModel GetUser(AuthorizationCommand command)
+        {
+            return _userRepository.Find(x => x.Email.Equals(command.Email)).FirstOrDefault();
         }
     }
 }

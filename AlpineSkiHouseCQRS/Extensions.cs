@@ -18,5 +18,19 @@ namespace AlpineSkiHouseCQRS
                 services.AddScoped(handler.GetInterfaces().First(t => t.IsGenericType && t.GetGenericTypeDefinition() == serviceInterfaces), handler);
             }
         }
+
+        public static bool IsEqualArray(this byte[] arr1, byte[] arr2)
+        {
+            if (arr2 == null) return false;
+
+            if (arr1.Length != arr2.Length) return false;
+
+            for(int i=arr1.Length-1; i>=0; i--)
+            {
+                if (arr1[i] != arr2[i]) return false;
+            }
+
+            return true;
+        }
     }
 }

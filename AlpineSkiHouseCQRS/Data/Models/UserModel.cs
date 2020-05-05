@@ -1,9 +1,16 @@
 ﻿using AlpineSkiHouseCQRS.Domain;
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace AlpineSkiHouseCQRS.Data.Models
 {
     public class UserModel : User
     {
-        public string Password { get; set; }
+        [MaxLength(64)]
+        public byte[] Password { get; set; }
+        [MaxLength(64)]
+        public byte[] Salt { get; set; }
+
+        public IdentityRole<string> Role { get; set; }
     }
 }
