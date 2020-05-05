@@ -8,6 +8,6 @@ namespace AlpineSkiHouseCQRS.Infrastructure
 {
     public interface ICommandDispatcher
     {
-        ICommandHandler<T> Dispatch<T>(T command, HttpContext requestContext) where T:ICommand;
+        ICommandHandler<T> Dispatch<T>(T command) where T:ICommand;
     }
 }

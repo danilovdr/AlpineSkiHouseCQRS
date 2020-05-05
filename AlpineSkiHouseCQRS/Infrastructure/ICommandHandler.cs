@@ -8,8 +8,6 @@ namespace AlpineSkiHouseCQRS.Infrastructure
 {
     public interface ICommandHandler<T> where T:ICommand
     {
-        HttpContext HttpContext { get; }
         Task Handle(T parametrs);
-        void SetHttpContext(HttpContext context);
     }
 }

@@ -9,7 +9,6 @@ namespace AlpineSkiHouseCQRS.Infrastructure
     public interface IQueryHandler<TQuery, TResult>
         where TQuery: IQuery<TResult>
     {
-        HttpContext HttpContext { get; }
         Task<TResult> Handle(TQuery parameters);
     }
 }
