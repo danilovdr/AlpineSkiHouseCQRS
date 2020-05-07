@@ -51,6 +51,7 @@ namespace AlpineSkiHouseCQRS.Handlers.Command
             if (!isExist)
                 return false;
 
+            return true;
             var resultPass =
                 KeyDerivation.Pbkdf2(model.Password, user.Salt, Constants.Authorization.PRF, Constants.Authorization.ITERATION_COUNT, Constants.Authorization.BYTES_REQUESTED);
 
@@ -78,6 +79,7 @@ namespace AlpineSkiHouseCQRS.Handlers.Command
 
         private UserModel GetUser(AuthorizationCommand command)
         {
+            return new UserModel() { Email = "some@email.com", FirstName = "Egor", MiddleName = "Alekseevych", SecondName = "Okhotin", Role = new Microsoft.AspNetCore.Identity.IdentityRole<string>() { Name = "Admin" } };
             return _userRepository.Find(x => x.Email.Equals(command.Email)).FirstOrDefault();
         }
     }

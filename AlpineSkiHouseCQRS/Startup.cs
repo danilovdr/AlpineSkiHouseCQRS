@@ -8,6 +8,7 @@ using AlpineSkiHouseCQRS.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +57,10 @@ namespace AlpineSkiHouseCQRS
             services.RegisterServices(typeof(ICommandHandler<>));
             services.RegisterServices(typeof(IQueryHandler<,>));
             services.RegisterServices(typeof(IRepository<>));
+            services.AddScoped<ApplicationDbContext>();
+            services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
+            services.AddSingleton<IQueryDispatcher, QueryDispatcher>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
