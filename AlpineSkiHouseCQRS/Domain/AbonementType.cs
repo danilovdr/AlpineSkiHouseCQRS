@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Domain
 {
-    public class AbonementType
+    public enum AbonementType
     {
+        Adult,
+        Child
     }
 }
