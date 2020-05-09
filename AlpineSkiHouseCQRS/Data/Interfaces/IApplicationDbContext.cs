@@ -12,6 +12,6 @@ namespace AlpineSkiHouseCQRS.Data.Interfaces
         DbSet<ZoneModel> Zones { get; set; }
         DbSet<SlopeModel> Slopes { get; set; }
 
-        void SaveAsync();
+        Task SaveAsync();
     }
 }

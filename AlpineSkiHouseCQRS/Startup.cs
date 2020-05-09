@@ -1,3 +1,4 @@
+using AlpineSkiHouseCQRS.Commands;
 using AlpineSkiHouseCQRS.Data.Implementations;
 using AlpineSkiHouseCQRS.Data.Implementations.Repositories;
 using AlpineSkiHouseCQRS.Data.Interfaces;
@@ -14,7 +15,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS
 {
@@ -92,6 +95,8 @@ namespace AlpineSkiHouseCQRS
 
             app.UseRouting();
 
+            app.UseMiddleware<JwtAuthorization>();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -102,8 +107,6 @@ namespace AlpineSkiHouseCQRS
                     pattern: "{controller}/{action=Index}/{id?}");
             });
 
-            app.UseMiddleware<JwtAuthorization>();
-
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
@@ -113,6 +116,32 @@ namespace AlpineSkiHouseCQRS
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+            InitDb(app).Wait();
+        }
+
+        public async Task InitDb(IApplicationBuilder app)
+        {
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                
+                var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+                
+                if((await context.Users.FirstOrDefaultAsync()) == null)
+                {
+                    var registrationHandler = scope.ServiceProvider.GetService<ICommandHandler<RegistrationCommand>>();
+                    var command = new RegistrationCommand()
+                    {
+                        Email = "some@mail.ru",
+                        BirthDate = DateTime.Parse("10.09.1998"),
+                        FirstName = "Petr",
+                        MiddleName = "Sergeevich",
+                        SecondName = "Sidorov",
+                        Password = "12345678"
+                    };
+                    await registrationHandler.Handle(command);
+                }
+            }
         }
     }
 }

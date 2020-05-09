@@ -3,6 +3,7 @@ using AlpineSkiHouseCQRS.Data.Models;
 using AlpineSkiHouseCQRS.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Data.Implementations
 {
@@ -18,7 +19,7 @@ namespace AlpineSkiHouseCQRS.Data.Implementations
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-            Database.EnsureCreatedAsync();
+            Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -58,7 +59,7 @@ namespace AlpineSkiHouseCQRS.Data.Implementations
                 .HasKey(p => p.Id);  
         }
 
-        public async void SaveAsync()
+        public async Task SaveAsync()
         {
             await SaveChangesAsync();
         }

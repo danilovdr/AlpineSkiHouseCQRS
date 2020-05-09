@@ -1,6 +1,7 @@
 ﻿using AlpineSkiHouseCQRS.Data.Interfaces;
 using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
 using AlpineSkiHouseCQRS.Data.Models;
+using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 {
@@ -26,9 +27,9 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 
         private IApplicationDbContext _dbContext;
 
-        public void Save()
+        public async Task Save()
         {
-            _dbContext.SaveAsync();
+            await _dbContext.SaveAsync();
         }
     }
 }

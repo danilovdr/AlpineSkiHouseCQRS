@@ -1,4 +1,5 @@
 ﻿using AlpineSkiHouseCQRS.Data.Models;
+using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Data.Interfaces.Repositories
 {
@@ -10,6 +11,6 @@ namespace AlpineSkiHouseCQRS.Data.Interfaces.Repositories
         public IRepository<ZoneModel> ZoneRepository { get; }
         public IRepository<SlopeModel> SlopeRepository { get; }
 
-        void Save();
+         Task Save();
     }
 }

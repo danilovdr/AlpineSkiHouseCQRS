@@ -16,10 +16,13 @@ namespace AlpineSkiHouseCQRS.Middleware
         public async Task InvokeAsync(HttpContext context)
         {
             var jwtKey = context.Items["JWT"] as string;
-            if (string.IsNullOrEmpty(jwtKey)) await _next(context);
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                await _next(context);
+                return;
+            }
 
             context.Request.Headers.Add("Authorization", $"Bearer {jwtKey}");
-
             await _next(context);
         }
     }
