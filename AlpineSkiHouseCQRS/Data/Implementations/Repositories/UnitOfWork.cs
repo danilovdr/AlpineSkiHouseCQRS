@@ -6,22 +6,29 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        public IRepository<UserModel> UserRepository { get; set; }
-        public IRepository<AbonementModel> AbonementRepository { get; set; }
-        public IRepository<UserAbonementModel> UserAbonementRepository { get; set; }
-        public IRepository<ZoneModel> ZoneRepository { get; set; }
-        public IRepository<SlopeModel> SlopeRepository { get; set; }
+        public IRepository<UserModel> UserRepository { get; }
+        public IRepository<AbonementModel> AbonementRepository { get; }
+        public IRepository<UserAbonementModel> UserAbonementRepository { get; }
+        public IRepository<ZoneModel> ZoneRepository { get; }
+        public IRepository<SlopeModel> SlopeRepository { get; }
 
-        public UnitOfWork(IApplicationDbContext dbContext)
+        public UnitOfWork(IApplicationDbContext dbContext, IRepository<UserModel> userRepository,
+            IRepository<AbonementModel> abonementRepository, IRepository<UserAbonementModel> userAbonementRepository,
+            IRepository<ZoneModel> zoneRepository, IRepository<SlopeModel> slopeRepository)
         {
             _dbContext = dbContext;
+            UserRepository = userRepository;
+            AbonementRepository = abonementRepository;
+            UserAbonementRepository = userAbonementRepository;
+            ZoneRepository = zoneRepository;
+            SlopeRepository = slopeRepository;
         }
 
         private IApplicationDbContext _dbContext;
 
         public void Save()
         {
-            _dbContext.SaveAsync();               
+            _dbContext.SaveAsync();
         }
     }
 }

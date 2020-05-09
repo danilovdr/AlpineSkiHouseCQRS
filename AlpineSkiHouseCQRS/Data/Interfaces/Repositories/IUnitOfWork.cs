@@ -4,11 +4,11 @@ namespace AlpineSkiHouseCQRS.Data.Interfaces.Repositories
 {
     public interface IUnitOfWork
     {
-        public IRepository<UserModel> UserRepository { get; set; }
-        public IRepository<AbonementModel> AbonementRepository { get; set; }
-        public IRepository<UserAbonementModel> UserAbonementRepository { get; set; }
-        public IRepository<ZoneModel> ZoneRepository { get; set; }
-        public IRepository<SlopeModel> SlopeRepository { get; set; }
+        public IRepository<UserModel> UserRepository { get; }
+        public IRepository<AbonementModel> AbonementRepository { get; }
+        public IRepository<UserAbonementModel> UserAbonementRepository { get; }
+        public IRepository<ZoneModel> ZoneRepository { get; }
+        public IRepository<SlopeModel> SlopeRepository { get; }
 
         void Save();
     }
