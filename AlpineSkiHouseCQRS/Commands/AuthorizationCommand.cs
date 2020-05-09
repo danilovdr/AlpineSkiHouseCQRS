@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AlpineSkiHouseCQRS.Models
+namespace AlpineSkiHouseCQRS.Commands
 {
     public class AuthorizationCommand : ICommand
     {

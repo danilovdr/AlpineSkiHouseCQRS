@@ -1,5 +1,5 @@
-﻿using AlpineSkiHouseCQRS.Infrastructure;
-using AlpineSkiHouseCQRS.Models;
+﻿using AlpineSkiHouseCQRS.Commands;
+using AlpineSkiHouseCQRS.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -18,6 +18,13 @@ namespace AlpineSkiHouseCQRS.Controllers
 
         [HttpPost]
         public async Task<StatusCodeResult> Authorize(AuthorizationCommand command)
+        {
+            await _commandDispatcher.Dispatch(command).Handle(command);
+            return new StatusCodeResult((int)System.Net.HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        public async Task<StatusCodeResult> Registrate(RegistrationCommand command)
         {
             await _commandDispatcher.Dispatch(command).Handle(command);
             return new StatusCodeResult((int)System.Net.HttpStatusCode.OK);
