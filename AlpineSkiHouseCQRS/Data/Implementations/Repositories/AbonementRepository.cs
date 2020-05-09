@@ -62,10 +62,5 @@ namespace AlpineSkiHouseCQRS.Data.Implementations.Repositories
             _dbContext.Abonements.Update(item);
         }
 
-        public void Save()
-        {
-            _dbContext.SaveAsync();
-        }
-
     }
 }

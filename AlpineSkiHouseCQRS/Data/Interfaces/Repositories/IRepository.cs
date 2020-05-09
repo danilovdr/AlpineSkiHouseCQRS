@@ -13,6 +13,5 @@ namespace AlpineSkiHouseCQRS.Data.Interfaces.Repositories
         void Create(T item);
         void Update(T item);
         void Delete(Guid id);
-        void Save();
     }
 }

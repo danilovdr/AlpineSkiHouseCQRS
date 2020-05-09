@@ -1,6 +1,5 @@
 ﻿using AlpineSkiHouseCQRS.Data.Interfaces;
 using AlpineSkiHouseCQRS.Data.Models;
-using AlpineSkiHouseCQRS.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
