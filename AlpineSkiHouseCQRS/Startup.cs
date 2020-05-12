@@ -1,10 +1,23 @@
+using AlpineSkiHouseCQRS.Commands;
+using AlpineSkiHouseCQRS.Data.Implementations;
+using AlpineSkiHouseCQRS.Data.Implementations.Repositories;
+using AlpineSkiHouseCQRS.Data.Interfaces;
+using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
+using AlpineSkiHouseCQRS.Infrastructure;
+using AlpineSkiHouseCQRS.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS
 {
@@ -21,7 +34,39 @@ namespace AlpineSkiHouseCQRS
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = true;
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration.GetValue<string>("JWT_Config:Issuer"),
+
+                        ValidateAudience = true,
+                        ValidAudience = Configuration.GetValue<string>("JWT_Config:Audience"),
+
+                        ValidateLifetime = true,
+
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(Configuration.GetValue<string>("JWT_PASSWORD"))),
+                        ValidateIssuerSigningKey = true
+                    };
+                }
+                );
+
             services.AddControllersWithViews();
+            services.RegisterServices(typeof(ICommandHandler<>));
+            services.RegisterServices(typeof(IQueryHandler<,>));
+            services.RegisterServices(typeof(IRepository<>));
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ApplicationDbContext>();
+            services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
+            services.AddSingleton<IQueryDispatcher, QueryDispatcher>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            string connectionString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
+                options.UseNpgsql(connectionString));
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -50,6 +95,11 @@ namespace AlpineSkiHouseCQRS
 
             app.UseRouting();
 
+            app.UseMiddleware<JwtAuthorization>();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -66,6 +116,32 @@ namespace AlpineSkiHouseCQRS
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+            InitDb(app).Wait();
+        }
+
+        public async Task InitDb(IApplicationBuilder app)
+        {
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                
+                var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+                
+                if((await context.Users.FirstOrDefaultAsync()) == null)
+                {
+                    var registrationHandler = scope.ServiceProvider.GetService<ICommandHandler<RegistrationCommand>>();
+                    var command = new RegistrationCommand()
+                    {
+                        Email = "some@mail.ru",
+                        BirthDate = DateTime.Parse("10.09.1998"),
+                        FirstName = "Petr",
+                        MiddleName = "Sergeevich",
+                        SecondName = "Sidorov",
+                        Password = "12345678"
+                    };
+                    await registrationHandler.Handle(command);
+                }
+            }
         }
     }
 }
