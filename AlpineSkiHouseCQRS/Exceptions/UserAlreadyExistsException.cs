@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AlpineSkiHouseCQRS.Infrastructure
+namespace AlpineSkiHouseCQRS.Exceptions
 {
-    public interface IInputDTO : ICommand
+    public class UserAlreadyExistsException : SkiHouseException
     {
     }
 }

@@ -1,15 +1,16 @@
-﻿using System;
+﻿using AlpineSkiHouseCQRS.Infrastructure;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace AlpineSkiHouseCQRS.Domain
+namespace AlpineSkiHouseCQRS.Commands
 {
-    public class User
+    public class RegistrationCommand : ICommand
     {
         [Required]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Key]
-        public Guid Id { get; set; }
+        public string Password { get; set; }
         [Required]
         public string Email { get; set; }
         [Required]
@@ -20,8 +21,5 @@ namespace AlpineSkiHouseCQRS.Domain
         public string SecondName { get; set; }
         [Required]
         public DateTime BirthDate { get; set; }
-
-        [NotMapped]
-        public string FullName => $"{MiddleName} {FirstName} {SecondName}";
     }
 }

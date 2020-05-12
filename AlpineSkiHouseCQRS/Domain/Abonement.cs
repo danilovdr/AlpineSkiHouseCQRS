@@ -8,6 +8,6 @@ namespace AlpineSkiHouseCQRS.Domain
         public string Name { get; set; }
         public int DaysDuration { get; set; }
         public AbonementType Type { get; set; }
-        public int Cost { get; set; }
+        public int DefaultCost { get; set; }
     }
 }
