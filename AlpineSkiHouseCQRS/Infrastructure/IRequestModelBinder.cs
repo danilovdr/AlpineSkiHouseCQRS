@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Infrastructure
 {
-    public interface IQueryHandler<IQuery>
+    public interface IRequestModelBinder<TRequest>
     {
-        Task<IQuery> Handle(IQuery parameters);
+        TRequest Bind(Microsoft.AspNetCore.Http.HttpContext context);
     }
 }

@@ -7,6 +7,7 @@ namespace AlpineSkiHouseCQRS.Infrastructure
 {
     public interface IQueryDispatcher
     {
-        IQueryHandler<IQuery<TResult>, TResult> Dispatch<TResult>(IQuery<TResult> parametr);
+        IQueryHandler<IQuery> Dispatch(IQuery parametr);
+        void RegisterHandler(IQuery query, Type handlerType);
     }
 }

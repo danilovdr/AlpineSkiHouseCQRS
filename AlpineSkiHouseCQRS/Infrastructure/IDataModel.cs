@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Infrastructure
 {
-    public interface IQuery : IDataModel
+    public interface IDataModel
     {
-        object Result { get; }
-        Type ResultType { get; }
+        Type ModelType { get; }
     }
 }

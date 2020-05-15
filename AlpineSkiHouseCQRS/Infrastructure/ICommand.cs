@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Infrastructure
 {
-    public interface ICommand
+    public interface ICommand : IDataModel
     {
     }
 }

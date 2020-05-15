@@ -17,5 +17,7 @@ namespace AlpineSkiHouseCQRS.Commands
         [DataType(DataType.Password)]
         [StringLength(25, MinimumLength = 5, ErrorMessage =" Password must be from 5 to 25 characters")]
         public string Password { get; set; }
+
+        public Type ModelType => typeof(AuthorizationCommand);
     }
 }
