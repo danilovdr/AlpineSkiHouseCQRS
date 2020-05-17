@@ -5,15 +5,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
+using Microsoft.Extensions.ObjectPool;
 
 namespace AlpineSkiHouseCQRS.Middleware
 {
+    //TODO: переделать на zero alloc
     public class CQRSRouting
     {
         IQueryDispatcher _queryDispatcher;
         ICommandDispatcher _commandDispatcher;
         IModelBinderDispatcher _modelBinderDispatcher;
         RequestDelegate _next;
+        const string COMMAND_REQUEST_PATTERN = @"[\/]command[\/]([\w]*)";
+        const string QUERY_REQUEST_PATTERN = @"[\/]query[\/]([\w]*)";
         public CQRSRouting(
             IQueryDispatcher queryDispatcher, 
             ICommandDispatcher commandDispatcher,
@@ -46,15 +53,16 @@ namespace AlpineSkiHouseCQRS.Middleware
 
         private async Task HandleCommandRequest(HttpContext context)
         {
-            var commandTypeName = context.Request.Path.Value.Split('/').Last() + "command";
-            var commandType = GetType().Assembly.GetType(commandTypeName);
-            if (commandType == null)
-                throw new InvalidOperationException(); //заменить на другой тип экспшена чтобы bad request кидало
+            var match = Regex.Match(context.Request.Path, COMMAND_REQUEST_PATTERN);
+            if (!match.Success) throw new InvalidOperationException(); //заменить на другой тип экспшена чтобы bad request кидало
 
-            //! validation
+            var commandRequestPath = match.Value;
+            var binder = _modelBinderDispatcher.DispatchRequestModel(commandRequestPath);
 
-            var binder = _modelBinderDispatcher.DispatchRequestModel(commandType);
             var command = binder.Bind(context) as ICommand;
+
+            IsActionExecutionValid(command, context); // переместить валидацию перед биндингом для оптимизации обработки
+
             var handler = _commandDispatcher.Dispatch(command);
 
             await handler.Handle(command);
@@ -62,22 +70,34 @@ namespace AlpineSkiHouseCQRS.Middleware
 
         private async Task HandleQueryRequest(HttpContext context)
         {
-            var queryTypeName = context.Request.Path.Value.Split('/').Last() + "command";
-            var queryType = GetType().Assembly.GetType(queryTypeName);
-            if (queryType == null)
-                throw new InvalidOperationException(); //заменить на другой тип экспшена чтобы bad request кидало
+            var match = Regex.Match(context.Request.Path, QUERY_REQUEST_PATTERN);
+            if (!match.Success) throw new InvalidOperationException(); //заменить на другой тип экспшена чтобы bad request кидало
 
-            //! validation
-
-            var binder = _modelBinderDispatcher.DispatchRequestModel(queryType);
+            var queryRequestPath = match.Value;
+            var binder = _modelBinderDispatcher.DispatchRequestModel(queryRequestPath);
             var query = binder.Bind(context) as IQuery;
+
+            IsActionExecutionValid(query, context); // переместить валидацию перед биндингом для оптимизации обработки
+
             var handler = _queryDispatcher.Dispatch(query);
 
             await handler.Handle(query);
             var result = query.Result;
 
-            var resultBinder = _modelBinderDispatcher.DispatchResponseModel(query.ResultType);
+            var resultBinder = _modelBinderDispatcher.DispatchResponseModel(queryRequestPath);
             resultBinder.Bind(result, context);
+        }
+
+        private bool IsActionExecutionValid(IDataModel command, HttpContext context)
+        {
+            var attribute = command.ModelType.GetCustomAttribute<AuthorizeAttribute>();
+            if (attribute == null) return true;
+
+            if (!context.User.Identity.IsAuthenticated) return false;
+
+            var userRole = context.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role).Value;
+
+            return attribute.Roles.Contains(userRole);
         }
     }
 }
