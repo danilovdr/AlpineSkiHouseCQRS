@@ -1,3 +1,4 @@
+using AlpineSkiHouseCQRS.Binders;
 using AlpineSkiHouseCQRS.Commands;
 using AlpineSkiHouseCQRS.Data.Implementations;
 using AlpineSkiHouseCQRS.Data.Implementations.Repositories;
@@ -66,6 +67,14 @@ namespace AlpineSkiHouseCQRS
             services.AddScoped<ApplicationDbContext>();
             services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
             services.AddSingleton<IQueryDispatcher, QueryDispatcher>();
+            services.AddSingleton<JSONModelBinder>();
+
+            services.AddSingleton<IModelBinderDispatcher, ModelBinderDispatcher>((provider) =>
+                new ModelBinderDispatcher(
+                    provider.GetService<JSONModelBinder>(),
+                    provider.GetService<JSONModelBinder>(), 
+                    provider));
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             //должны регаться последними
             services.RegisterCommandHandlers();
