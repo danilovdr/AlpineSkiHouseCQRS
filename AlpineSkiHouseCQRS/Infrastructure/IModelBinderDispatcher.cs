@@ -7,8 +7,11 @@ namespace AlpineSkiHouseCQRS.Infrastructure
 {
     public interface IModelBinderDispatcher
     {
-        IRequestModelBinder<IDataModel> DispatchRequestModel(Type type);
+        IRequestModelBinder<IDataModel> DispatchRequestModel(string requestPath);
 
-        IResponseModelBinder DispatchResponseModel(Type type);
+        IResponseModelBinder DispatchResponseModel(string requestPath);
+
+        void RegisterRequestBinder(string request, Type binderType);
+        void RegisterResponseBinder(string request, Type binderType);
     }
 }
