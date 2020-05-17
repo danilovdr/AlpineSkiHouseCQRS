@@ -3,6 +3,7 @@ using AlpineSkiHouseCQRS.Data.Implementations;
 using AlpineSkiHouseCQRS.Data.Implementations.Repositories;
 using AlpineSkiHouseCQRS.Data.Interfaces;
 using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
+using AlpineSkiHouseCQRS.Dispatchers;
 using AlpineSkiHouseCQRS.Infrastructure;
 using AlpineSkiHouseCQRS.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
