@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace AlpineSkiHouseCQRS.Infrastructure
 {
-    public interface IQuery : IDataModel
+    public interface IResponseModelBinder
     {
-        object Result { get; }
-        Type ResultType { get; }
+        void Bind(object result, Microsoft.AspNetCore.Http.HttpContext context);
     }
 }

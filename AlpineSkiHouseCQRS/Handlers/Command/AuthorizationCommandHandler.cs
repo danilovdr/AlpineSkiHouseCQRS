@@ -2,7 +2,6 @@
 using AlpineSkiHouseCQRS.Data.Models;
 using AlpineSkiHouseCQRS.Exceptions;
 using AlpineSkiHouseCQRS.Infrastructure;
-using AlpineSkiHouseCQRS.Models;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Security.Principal;
+using AlpineSkiHouseCQRS.Commands;
 
 namespace AlpineSkiHouseCQRS.Handlers.Command
 {

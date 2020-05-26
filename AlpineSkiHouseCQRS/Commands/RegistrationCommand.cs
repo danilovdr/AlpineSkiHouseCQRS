@@ -21,5 +21,7 @@ namespace AlpineSkiHouseCQRS.Commands
         public string SecondName { get; set; }
         [Required]
         public DateTime BirthDate { get; set; }
+
+        public Type ModelType => typeof(RegistrationCommand);
     }
 }

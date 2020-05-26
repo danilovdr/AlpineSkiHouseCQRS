@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AlpineSkiHouseCQRS.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +11,49 @@ namespace AlpineSkiHouseCQRS
     {
         public static void RegisterServices(this IServiceCollection services, Type serviceInterfaces)
         {
-            var handlers = typeof(Startup).Assembly.GetTypes()
-                .Where(x => x.GetInterfaces().Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == serviceInterfaces));
+            var handlers = GetGenericTypes(serviceInterfaces);
 
             foreach(var handler in handlers)
             {
                 services.AddScoped(handler.GetInterfaces().First(t => t.IsGenericType && t.GetGenericTypeDefinition() == serviceInterfaces), handler);
             }
         }
+
+        public static void RegisterCommandHandlers(this IServiceCollection services)
+        {
+            var serviceInterfaces = typeof(ICommandHandler<>);
+            var handlers = GetGenericTypes(serviceInterfaces);
+            var dispatcher = services.BuildServiceProvider().GetService<ICommandDispatcher>();
+
+
+            foreach(var handler in handlers)
+            {
+                var interfaceForDI = handler.GetInterfaces().First(t => t.IsGenericType && t.GetGenericTypeDefinition() == serviceInterfaces);
+                var command = Activator.CreateInstance(interfaceForDI.GenericTypeArguments.First()) as ICommand;
+                dispatcher.RegisterHandler(command, handler);
+            }
+        }
+
+        public static void RegisterQueryHandlers(this IServiceCollection services)
+        {
+            var serviceInterfaces = typeof(IQueryHandler<>);
+            var handlers = GetGenericTypes(serviceInterfaces);
+            var dispatcher = services.BuildServiceProvider().GetService<IQueryDispatcher>();
+
+
+            foreach (var handler in handlers)
+            {
+                var interfaceForDI = handler.GetInterfaces().First(t => t.IsGenericType && t.GetGenericTypeDefinition() == serviceInterfaces);
+                var command = Activator.CreateInstance(interfaceForDI.GenericTypeArguments.First()) as IQuery;
+                dispatcher.RegisterHandler(command, handler);
+            }
+        }
+
+        private static Type[] GetAssemblyTypes() => typeof(Startup).Assembly.GetTypes();
+
+        private static IEnumerable<Type> GetGenericTypes(Type serviceInterfaces) =>
+            GetAssemblyTypes()
+                .Where(x => x.GetInterfaces().Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == serviceInterfaces));
 
         public static bool IsEqualArray(this byte[] arr1, byte[] arr2)
         {

@@ -8,6 +8,7 @@ namespace AlpineSkiHouseCQRS.Infrastructure
 {
     public interface ICommandDispatcher
     {
-        ICommandHandler<T> Dispatch<T>(T command) where T:ICommand;
+        ICommandHandler<ICommand> Dispatch(ICommand command);
+        void RegisterHandler(ICommand command, Type handlerType);
     }
 }

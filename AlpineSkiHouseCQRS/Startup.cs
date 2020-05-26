@@ -1,8 +1,10 @@
+using AlpineSkiHouseCQRS.Binders;
 using AlpineSkiHouseCQRS.Commands;
 using AlpineSkiHouseCQRS.Data.Implementations;
 using AlpineSkiHouseCQRS.Data.Implementations.Repositories;
 using AlpineSkiHouseCQRS.Data.Interfaces;
 using AlpineSkiHouseCQRS.Data.Interfaces.Repositories;
+using AlpineSkiHouseCQRS.Dispatchers;
 using AlpineSkiHouseCQRS.Infrastructure;
 using AlpineSkiHouseCQRS.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +18,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,13 +60,25 @@ namespace AlpineSkiHouseCQRS
 
             services.AddControllersWithViews();
             services.RegisterServices(typeof(ICommandHandler<>));
-            services.RegisterServices(typeof(IQueryHandler<,>));
+            services.RegisterServices(typeof(IQueryHandler<>));
             services.RegisterServices(typeof(IRepository<>));
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IEnumerable<string>>((x) => new List<string>() { "new" });
             services.AddScoped<ApplicationDbContext>();
             services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
             services.AddSingleton<IQueryDispatcher, QueryDispatcher>();
+            services.AddSingleton<JSONModelBinder>();
+
+            services.AddSingleton<IModelBinderDispatcher, ModelBinderDispatcher>((provider) =>
+                new ModelBinderDispatcher(
+                    provider.GetService<JSONModelBinder>(),
+                    provider.GetService<JSONModelBinder>(), 
+                    provider));
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            //должны регаться последними
+            services.RegisterCommandHandlers();
+            services.RegisterQueryHandlers();
 
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
@@ -94,8 +110,9 @@ namespace AlpineSkiHouseCQRS
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+            //app.UseMiddleware<CQRSRouting>();
 
-            app.UseMiddleware<JwtAuthorization>();
+           // app.UseMiddleware<JwtAuthorization>();
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -126,7 +143,7 @@ namespace AlpineSkiHouseCQRS
             {
                 
                 var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
-                
+
                 if((await context.Users.FirstOrDefaultAsync()) == null)
                 {
                     var registrationHandler = scope.ServiceProvider.GetService<ICommandHandler<RegistrationCommand>>();
